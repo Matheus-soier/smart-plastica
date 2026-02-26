@@ -14,18 +14,7 @@ type Option = {
   points?: number;
 };
 
-type TextStep = {
-  kind: "text";
-  id: "nome" | "telefone" | "email";
-  question: string;
-  helper: string;
-  placeholder: string;
-  optional?: boolean;
-  type?: "text" | "email";
-};
-
 type ChoiceStep = {
-  kind: "choice";
   id: string;
   question: string;
   helper: string;
@@ -33,40 +22,14 @@ type ChoiceStep = {
   scored?: boolean;
 };
 
-type Step = TextStep | ChoiceStep;
-
 type ScoreResult = {
   raw: number;
   percent: number;
   priority: "ALTA" | "MEDIA" | "NUTRICAO";
 };
 
-const steps: Step[] = [
+const qualificationSteps: ChoiceStep[] = [
   {
-    kind: "text",
-    id: "nome",
-    question: "Como você gostaria de ser chamada?",
-    helper: "Assim personalizamos seu atendimento desde o primeiro contato.",
-    placeholder: "Digite seu nome",
-  },
-  {
-    kind: "text",
-    id: "telefone",
-    question: "Qual seu melhor WhatsApp para contato?",
-    helper: "Usaremos este número para te retornar com orientações iniciais.",
-    placeholder: "(11) 99999-9999",
-  },
-  {
-    kind: "text",
-    id: "email",
-    question: "Se preferir, informe também seu e-mail.",
-    helper: "Opcional. Enviamos somente informações do seu atendimento.",
-    placeholder: "voce@email.com",
-    optional: true,
-    type: "email",
-  },
-  {
-    kind: "choice",
     id: "objetivo_lipo",
     question: "Na Lipo HD, qual resultado você mais busca agora?",
     helper: "Isso ajuda a equipe a entender o desenho corporal que você deseja.",
@@ -90,7 +53,6 @@ const steps: Step[] = [
     ],
   },
   {
-    kind: "choice",
     id: "regiao_principal",
     question: "Qual região você quer priorizar na Lipo HD?",
     helper: "Assim direcionamos melhor sua avaliação inicial.",
@@ -102,7 +64,6 @@ const steps: Step[] = [
     ],
   },
   {
-    kind: "choice",
     id: "peso_estavel",
     question: "Seu peso está estável nos últimos meses?",
     helper: "Esse é um dado importante para indicação e planejamento da Lipo HD.",
@@ -114,7 +75,6 @@ const steps: Step[] = [
     ],
   },
   {
-    kind: "choice",
     id: "prazo",
     question: "Em quanto tempo você gostaria de avançar com a Lipo HD?",
     helper: "Isso organiza melhor prioridade e disponibilidade da agenda.",
@@ -126,7 +86,6 @@ const steps: Step[] = [
     ],
   },
   {
-    kind: "choice",
     id: "orcamento",
     question: "Como está seu planejamento de investimento hoje?",
     helper: "Isso nos ajuda a sugerir o caminho mais viável para você.",
@@ -138,7 +97,6 @@ const steps: Step[] = [
     ],
   },
   {
-    kind: "choice",
     id: "unidade",
     question: "Qual unidade faz mais sentido para seu atendimento?",
     helper: "Assim você já fala com a equipe da praça certa.",
@@ -150,7 +108,6 @@ const steps: Step[] = [
     ],
   },
   {
-    kind: "choice",
     id: "distancia",
     question: "Você está próxima(o) da unidade escolhida?",
     helper: "Isso ajuda no planejamento do deslocamento para avaliação e retorno.",
@@ -162,7 +119,6 @@ const steps: Step[] = [
     ],
   },
   {
-    kind: "choice",
     id: "disponibilidade",
     question: "Como está sua disponibilidade para avaliação presencial?",
     helper: "Com isso conseguimos sugerir janelas de agenda compatíveis.",
@@ -174,7 +130,6 @@ const steps: Step[] = [
     ],
   },
   {
-    kind: "choice",
     id: "apoio",
     question: "Você já conta com rede de apoio para o pós-operatório?",
     helper: "É um ponto importante para uma recuperação tranquila.",
@@ -186,20 +141,17 @@ const steps: Step[] = [
     ],
   },
   {
-    kind: "choice",
     id: "prontidao",
     question: "Neste momento, qual próximo passo você prefere para sua Lipo HD?",
     helper: "Essa resposta direciona o tipo de orientação no WhatsApp.",
     scored: true,
     options: [
-      { value: "agendar", label: "Quero agendar minha avaliação", points: 12 },
+      { value: "agendar", label: "Quero falar com uma consultora", points: 12 },
       { value: "falar", label: "Quero conversar com especialista", points: 8 },
       { value: "avaliar", label: "Prefiro entender mais antes", points: 3 },
     ],
   },
 ];
-
-const progressCurve = [18, 34, 48, 60, 68, 74, 79, 84, 88, 91, 94, 96, 98, 100];
 
 function formatPhone(value: string) {
   const digits = value.replace(/\D/g, "").slice(0, 11);
@@ -234,9 +186,15 @@ function getPriority(percent: number): ScoreResult {
 }
 
 function getChoiceLabel(stepId: string, selectedValue: string | undefined) {
-  const step = steps.find((item): item is ChoiceStep => item.kind === "choice" && item.id === stepId);
+  const step = qualificationSteps.find((item) => item.id === stepId);
   if (!step || !selectedValue) return "Não informado";
   return step.options.find((option) => option.value === selectedValue)?.label ?? "Não informado";
+}
+
+function getProgress(currentIndex: number, totalSteps: number) {
+  const ratio = Math.min((currentIndex + 1) / totalSteps, 1);
+  const eased = 1 - Math.pow(1 - ratio, 1.65);
+  return Math.round(14 + eased * 86);
 }
 
 type QualificationFunnelProps = {
@@ -251,13 +209,12 @@ export function QualificationFunnel({
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const currentStep = steps[currentIndex];
+  const totalSteps = qualificationSteps.length + 1;
+  const isLeadStep = currentIndex === 0;
+  const currentStep = isLeadStep ? null : qualificationSteps[currentIndex - 1];
 
   const scoredSteps = useMemo(
-    () =>
-      steps.filter(
-        (step): step is ChoiceStep => step.kind === "choice" && Boolean(step.scored),
-      ),
+    () => qualificationSteps.filter((step) => Boolean(step.scored)),
     [],
   );
 
@@ -286,41 +243,28 @@ export function QualificationFunnel({
     };
   }, [maxScore, scoredSteps, values]);
 
-  const progress = isSubmitting
-    ? 100
-    : progressCurve[Math.min(currentIndex, progressCurve.length - 2)] ?? 18;
+  const progress = isSubmitting ? 100 : getProgress(currentIndex, totalSteps);
 
-  const goBack = () => {
-    setError("");
-    setCurrentIndex((prev) => Math.max(prev - 1, 0));
-  };
+  const validateLeadStep = () => {
+    const name = (values.nome ?? "").trim();
+    const phone = (values.telefone ?? "").trim();
+    const email = (values.email ?? "").trim();
 
-  const validateCurrentText = () => {
-    if (!currentStep || currentStep.kind !== "text") return false;
-    const value = (values[currentStep.id] ?? "").trim();
-
-    if (!currentStep.optional && !value) {
-      setError("Preencha este campo para continuar.");
+    if (name.length < 3) {
+      setError("Digite seu nome completo para continuar.");
       return false;
     }
 
-    if (currentStep.id === "nome" && value.length > 0 && value.length < 3) {
-      setError("Digite um nome válido.");
+    const digitsLength = phone.replace(/\D/g, "").length;
+    if (digitsLength < 10 || digitsLength > 11) {
+      setError("Digite um WhatsApp válido com DDD.");
       return false;
     }
 
-    if (currentStep.id === "telefone") {
-      const digitsLength = value.replace(/\D/g, "").length;
-      if (digitsLength < 10 || digitsLength > 11) {
-        setError("Digite um WhatsApp válido com DDD.");
-        return false;
-      }
-    }
-
-    if (currentStep.id === "email" && value) {
-      const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-      if (!isValid) {
-        setError("Digite um e-mail válido ou deixe este campo em branco.");
+    if (email) {
+      const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      if (!isValidEmail) {
+        setError("Digite um e-mail válido ou deixe em branco.");
         return false;
       }
     }
@@ -329,9 +273,9 @@ export function QualificationFunnel({
     return true;
   };
 
-  const goNextTextStep = () => {
-    if (!validateCurrentText()) return;
-    setCurrentIndex((prev) => Math.min(prev + 1, steps.length - 1));
+  const goNextFromLead = () => {
+    if (!validateLeadStep()) return;
+    setCurrentIndex(1);
   };
 
   const finalizeToWhatsApp = (nextValues: Record<string, string>) => {
@@ -394,18 +338,18 @@ export function QualificationFunnel({
     setValues(nextValues);
     setError("");
 
-    if (currentIndex === steps.length - 1) {
+    if (currentIndex === totalSteps - 1) {
       finalizeToWhatsApp(nextValues);
       return;
     }
 
     window.setTimeout(() => {
-      setCurrentIndex((prev) => Math.min(prev + 1, steps.length - 1));
+      setCurrentIndex((prev) => Math.min(prev + 1, totalSteps - 1));
     }, 120);
   };
 
   return (
-    <div className="space-y-2.5 px-4 pb-4 pt-8 md:space-y-3 md:px-5 md:pb-5 md:pt-8">
+    <div className="space-y-2.5 px-4 pb-[max(env(safe-area-inset-bottom),1rem)] pt-3 md:space-y-3 md:px-5 md:pb-5 md:pt-3">
       <div className="space-y-1">
         <div className="h-1.5 rounded-full bg-[#ead7c9]">
           <div
@@ -415,7 +359,7 @@ export function QualificationFunnel({
         </div>
         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-0.5 text-[0.68rem] text-[#7f6152] md:text-[0.72rem]">
           <p>Leva cerca de 2 minutos.</p>
-          <p>Retorno em at&eacute; 5 minutos.</p>
+          <p>Retorno em at&eacute; 24 horas &uacute;teis.</p>
         </div>
       </div>
 
@@ -434,76 +378,92 @@ export function QualificationFunnel({
             <p>Abrindo WhatsApp...</p>
           </CardContent>
         </Card>
-      ) : currentStep.kind === "text" ? (
+      ) : isLeadStep ? (
         <Card className="rounded-2xl border-[#d9baa6] bg-white">
           <CardHeader className="space-y-1.5 p-4 pb-3 md:space-y-2 md:p-5 md:pb-4">
             <CardTitle className="font-display text-[clamp(1.45rem,5vw,1.9rem)] leading-[1.08] text-[#5b2c1e] md:text-[2.15rem]">
-              {currentStep.question}
+              Para começar, confirme seus dados de contato.
             </CardTitle>
             <CardDescription className="text-sm text-[#6f5144] md:text-base">
-              {currentStep.helper}
+              Isso permite que nossa equipe retorne com orientação personalizada para sua Lipo HD.
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="space-y-2.5 p-4 pt-1 md:space-y-3 md:p-5 md:pt-1">
+          <CardContent className="space-y-3 p-4 pt-1 md:space-y-3.5 md:p-5 md:pt-1">
             <div className="space-y-2">
-              <Label htmlFor={currentStep.id}>
-                {currentStep.id === "nome"
-                  ? "Nome"
-                  : currentStep.id === "telefone"
-                    ? "WhatsApp"
-                    : "E-mail (opcional)"}
-              </Label>
+              <Label htmlFor="nome">Nome</Label>
               <Input
-                id={currentStep.id}
-                className="h-10 text-[0.98rem]"
-                type={currentStep.type ?? "text"}
-                inputMode={currentStep.id === "telefone" ? "numeric" : undefined}
-                placeholder={currentStep.placeholder}
-                value={values[currentStep.id] ?? ""}
+                id="nome"
+                type="text"
+                autoComplete="name"
+                autoCorrect="on"
+                autoCapitalize="words"
+                enterKeyHint="next"
+                placeholder="Digite seu nome"
+                className="h-11 text-base md:h-10 md:text-[0.98rem]"
+                value={values.nome ?? ""}
                 onChange={(event) => {
-                  const nextValue =
-                    currentStep.id === "telefone"
-                      ? formatPhone(event.target.value)
-                      : event.target.value;
-                  setValues((prev) => ({ ...prev, [currentStep.id]: nextValue }));
+                  setValues((prev) => ({ ...prev, nome: event.target.value }));
+                  if (error) setError("");
+                }}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="telefone">WhatsApp</Label>
+              <Input
+                id="telefone"
+                type="tel"
+                inputMode="numeric"
+                autoComplete="tel"
+                enterKeyHint="next"
+                placeholder="(11) 99999-9999"
+                className="h-11 text-base md:h-10 md:text-[0.98rem]"
+                value={values.telefone ?? ""}
+                onChange={(event) => {
+                  setValues((prev) => ({ ...prev, telefone: formatPhone(event.target.value) }));
+                  if (error) setError("");
+                }}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email">E-mail (opcional)</Label>
+              <Input
+                id="email"
+                type="email"
+                autoComplete="email"
+                autoCorrect="off"
+                autoCapitalize="off"
+                enterKeyHint="done"
+                placeholder="voce@email.com"
+                className="h-11 text-base md:h-10 md:text-[0.98rem]"
+                value={values.email ?? ""}
+                onChange={(event) => {
+                  setValues((prev) => ({ ...prev, email: event.target.value }));
                   if (error) setError("");
                 }}
                 onKeyDown={(event) => {
                   if (event.key === "Enter") {
                     event.preventDefault();
-                    goNextTextStep();
+                    goNextFromLead();
                   }
                 }}
-                aria-invalid={Boolean(error)}
               />
-              {error ? <p className="text-sm text-red-600">{error}</p> : null}
             </div>
 
-            <div className="flex flex-col gap-3 sm:flex-row">
-              {currentIndex > 0 ? (
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-10 border-[#a74e31] text-[#7d412d]"
-                  onClick={goBack}
-                >
-                  Voltar
-                </Button>
-              ) : null}
-              <Button
-                type="button"
-                className="h-10 bg-[#a74e31] text-white hover:bg-[#8f4229]"
-                onClick={goNextTextStep}
-              >
-                {currentStep.optional && !(values[currentStep.id] ?? "").trim()
-                  ? "Continuar sem e-mail"
-                  : "Continuar"}
-              </Button>
-            </div>
+            {error ? <p className="text-sm text-red-600">{error}</p> : null}
+
+            <Button
+              type="button"
+              className="h-10 w-full bg-[#a74e31] text-white hover:bg-[#8f4229]"
+              onClick={goNextFromLead}
+            >
+              Continuar
+            </Button>
           </CardContent>
         </Card>
-      ) : (
+      ) : currentStep ? (
         <Card className="rounded-2xl border-[#d9baa6] bg-white">
           <CardHeader className="space-y-1.5 p-4 pb-3 md:space-y-2 md:p-5 md:pb-4">
             <CardTitle className="font-display text-[clamp(1.45rem,5vw,1.9rem)] leading-[1.08] text-[#5b2c1e] md:text-[2.15rem]">
@@ -527,20 +487,9 @@ export function QualificationFunnel({
                 {option.label}
               </button>
             ))}
-
-            {currentIndex > 0 ? (
-              <Button
-                type="button"
-                variant="ghost"
-                className="mt-1 h-9 self-start text-[#7d412d]"
-                onClick={goBack}
-              >
-                Voltar
-              </Button>
-            ) : null}
           </CardContent>
         </Card>
-      )}
+      ) : null}
     </div>
   );
 }

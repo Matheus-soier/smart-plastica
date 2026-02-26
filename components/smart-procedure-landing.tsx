@@ -14,23 +14,25 @@ import {
   Shirt,
   Sparkles,
   Stethoscope,
+  X,
 } from "lucide-react";
+import Marquee from "react-fast-marquee";
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { SectionPattern } from "@/components/brand-support-elements";
 import { HeroFluidFabricBackground } from "@/components/hero-fluid-fabric-background";
 import { SmartLogo } from "@/components/smart-logo";
 import { QualificationFunnel } from "@/components/qualification-funnel";
 
 const trustMetrics = [
-  { value: "+2.000", label: "cirurgias realizadas" },
-  { value: "98%", label: "satisfação das pacientes" },
-  { value: "12 anos", label: "cuidando de você" },
-  { value: "Equipe", label: "multidisciplinar completa" },
+  { value: "+5 anos", label: "de atuação no mercado" },
+  { value: "+2.000", label: "Smart Lovers atendidas" },
+  { value: "100%", label: "cirurgiões certificados pela SBCP" },
+  { value: "2 cidades", label: "de atuação: Pelotas-RS e São Paulo-SP" },
 ];
 
 const pains = [
@@ -66,52 +68,56 @@ const gains = [
 
 const journey = [
   {
-    title: "Avaliação personalizada",
-    text: "Consulta cuidadosa para entender seu desejo, tirar dúvidas e traçar o melhor caminho.",
+    title: "Videochamada inicial",
+    text: "Primeiro contato gratuito e sem compromisso, com duração média de 30 a 45 minutos.",
   },
   {
-    title: "Preparo completo",
-    text: "Orientações clínicas e de rotina para chegar ao procedimento com segurança.",
+    title: "Consultoria especializada",
+    text: "Match entre paciente e cirurgião para direcionar o plano mais alinhado ao seu perfil.",
   },
   {
-    title: "Procedimento com tecnologia",
-    text: "Técnicas modernas para resultado harmônico e recuperação mais confortável.",
+    title: "Consulta médica e planejamento",
+    text: "Avaliação presencial com cirurgião certificado pela SBCP e definição técnica personalizada.",
   },
   {
-    title: "Acompanhamento próximo",
-    text: "Retornos estruturados e suporte de enfermagem durante toda a recuperação.",
+    title: "Pré-operatório estruturado",
+    text: "Organização de exames e protocolo pré-cirúrgico. Intervalo estimado: 2 a 4 semanas até a cirurgia.",
   },
   {
-    title: "Sua melhor versão",
-    text: "Resultado que respeita sua essência e fortalece sua confiança.",
+    title: "Cirurgia hospitalar",
+    text: "Procedimento realizado em hospital de referência. Acompanhante obrigatório no dia e nas primeiras 24 a 48h.",
+  },
+  {
+    title: "Pós-operatório especializado",
+    text: "Acompanhamento contínuo com foco em recuperação, incluindo fisioterapia pós-operatória na própria clínica.",
   },
 ];
 
 const differentials = [
   {
     icon: Sparkles,
-    title: "Tecnologia que cuida",
-    text: "Recursos modernos que favorecem resultado natural e recuperação leve.",
+    title: "Consultoria com match cirurgião",
+    text: "Direcionamento especializado para conectar você ao cirurgião mais aderente ao seu caso.",
   },
   {
     icon: ShieldCheck,
-    title: "Segurança em cada detalhe",
-    text: "Protocolos completos do pré ao pós-operatório para proteger você.",
+    title: "Segurança hospitalar nas 2 cidades",
+    text: "Cirurgias realizadas em hospitais de referência em Pelotas-RS e São Paulo-SP.",
   },
   {
     icon: HeartHandshake,
-    title: "Seu sonho ao seu alcance",
-    text: "Caminho claro, transparente e organizado para sua decisão.",
+    title: "Viabilidade de pagamento",
+    text: "Parcelamento em até 18x no cartão de crédito para facilitar sua organização.",
   },
   {
     icon: Stethoscope,
-    title: "Domínio técnico",
-    text: "Equipe capacitada e em constante atualização.",
+    title: "Pós-operatório como especialidade",
+    text: "Suporte de recuperação com fisioterapia pós-operatória dentro da própria clínica e acompanhamento próximo.",
   },
   {
     icon: MessageCircle,
-    title: "Cuidado que respeita sua história",
-    text: "Acolhimento real e suporte próximo em toda jornada.",
+    title: "Origem + expansão + consultoria online",
+    text: "Marca nascida em Pelotas-RS, expandida para São Paulo-SP e com consultoria online disponível.",
   },
 ];
 
@@ -150,27 +156,27 @@ const beforeAfterSlots = [
 const faqItems = [
   {
     q: "A cirurgia é segura?",
-    a: "Seguimos protocolos rigorosos em todas as etapas, com avaliação individual e acompanhamento completo.",
+    a: "As cirurgias são realizadas em hospitais de referência e por cirurgiões certificados pela SBCP, com protocolo completo do pré ao pós-operatório.",
   },
   {
-    q: "Vou sentir muita dor?",
-    a: "Com técnica moderna e plano de cuidado estruturado, a recuperação tende a ser mais confortável.",
+    q: "Como funciona a videochamada inicial?",
+    a: "A videochamada é gratuita, sem compromisso e dura em média de 30 a 45 minutos para orientação inicial da sua jornada.",
   },
   {
-    q: "Quanto tempo leva a recuperação?",
-    a: "Varia conforme perfil e procedimento. Por isso, cada paciente recebe cronograma de retorno personalizado.",
+    q: "Em quanto tempo posso operar após a consulta médica?",
+    a: "O intervalo estimado entre consulta médica e cirurgia costuma ficar entre 2 e 4 semanas, conforme exames e disponibilidade.",
   },
   {
-    q: "Consigo pagar?",
-    a: "Na avaliação mostramos caminhos viáveis de forma transparente e sem pressão.",
+    q: "Quais são as formas de pagamento?",
+    a: "Trabalhamos com parcelamento em até 18x no cartão de crédito, com orientação transparente durante a consultoria.",
   },
   {
-    q: "O resultado fica natural?",
-    a: "Nosso foco é respeitar sua anatomia e sua essência, buscando harmonia e naturalidade.",
+    q: "Preciso de acompanhante no procedimento?",
+    a: "Sim. É obrigatório acompanhante no dia da cirurgia e nas primeiras 24 a 48 horas do pós-operatório.",
   },
   {
-    q: "E se eu tiver medo?",
-    a: "Medo é natural. Nossa equipe acolhe cada dúvida com escuta e orientação clara.",
+    q: "Vocês atendem apenas presencialmente?",
+    a: "Atendemos presencialmente em Pelotas-RS e São Paulo-SP, com consultoria online disponível no primeiro contato.",
   },
 ];
 
@@ -221,11 +227,11 @@ export function SmartProcedureLanding() {
                 className="h-12 rounded-lg bg-[#a74e31] px-7 text-base text-white hover:bg-[#8f4229]"
                 onClick={openFunnel}
               >
-                Quero agendar minha avaliação
+                Quero falar com uma consultora
               </Button>
               <p className="text-sm text-[#f4ddcf]">
-                ✦ Mais de 2.000 pacientes transformadas · ✦ 12 anos de experiência · ✦ Equipe
-                multidisciplinar
+                ✦ +5 anos de atuação · ✦ +2.000 Smart Lovers · ✦ 100% dos cirurgiões certificados
+                pela SBCP
               </p>
             </div>
           </div>
@@ -234,17 +240,25 @@ export function SmartProcedureLanding() {
             <CardHeader>
               <CardTitle className="font-display text-4xl text-[#6f3a29]">Jornada Smart 360º</CardTitle>
               <CardDescription className="text-[#6f3a29]/85">
-                Tudo em uma sequência clara para você se sentir segura em cada passo.
+                São 6 etapas do primeiro contato ao pós-operatório, com clareza em cada passo.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-[#5b2c1e]">
-              <p className="rounded-xl bg-[#f3e1d4] px-3 py-2 font-medium">Avaliação individual e sem pressa</p>
-              <p className="rounded-xl bg-[#f3e1d4] px-3 py-2 font-medium">Planejamento seguro e personalizado</p>
-              <p className="rounded-xl bg-[#f3e1d4] px-3 py-2 font-medium">Acompanhamento próximo no pós-operatório</p>
+              <p className="rounded-xl bg-[#f3e1d4] px-3 py-2 font-medium">
+                Videochamada inicial gratuita e sem compromisso (30 a 45 min)
+              </p>
+              <p className="rounded-xl bg-[#f3e1d4] px-3 py-2 font-medium">
+                Consultoria especializada com match entre paciente e cirurgião
+              </p>
+              <p className="rounded-xl bg-[#f3e1d4] px-3 py-2 font-medium">
+                Tempo estimado entre consulta médica e cirurgia: 2 a 4 semanas
+              </p>
+              <p className="rounded-xl bg-[#f3e1d4] px-3 py-2 font-medium">
+                Pós-operatório com acompanhamento especializado na própria clínica
+              </p>
               <Button
                 type="button"
-                variant="outline"
-                className="w-full border-[#a74e31] text-[#7b3f2b]"
+                className="h-11 w-full bg-[#8f4229] text-white hover:bg-[#7b3923]"
                 onClick={openFunnel}
               >
                 Iniciar pré-atendimento
@@ -255,13 +269,18 @@ export function SmartProcedureLanding() {
       </header>
 
       <section className="bg-[#5b2c1e] py-6 text-[#f9ecdf]">
-        <div className="mx-auto grid w-full max-w-7xl grid-cols-2 gap-4 px-6 text-center md:grid-cols-4">
-          {trustMetrics.map((item) => (
-            <div key={item.label}>
-              <p className="font-display text-3xl md:text-4xl">{item.value}</p>
-              <p className="text-sm text-[#f9ecdf]/90">{item.label}</p>
-            </div>
-          ))}
+        <div className="mx-auto w-full max-w-7xl px-6">
+          <div className="grid grid-cols-2 gap-4 text-center md:grid-cols-4">
+            {trustMetrics.map((item) => (
+              <div key={item.label}>
+                <p className="font-display text-3xl md:text-4xl">{item.value}</p>
+                <p className="text-sm text-[#f9ecdf]/90">{item.label}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 text-center text-sm text-[#f9ecdf]/85">
+            Cirurgias realizadas em hospitais de referência nas duas cidades.
+          </p>
         </div>
       </section>
 
@@ -301,7 +320,7 @@ export function SmartProcedureLanding() {
         </section>
 
         <section className="relative overflow-hidden bg-[linear-gradient(125deg,_#8f7867_0%,_#a28c7d_48%,_#b8a497_100%)] py-20 text-[#fff7f0]">
-          <SectionPattern variant="curves" color="#5d2b1d" opacity={0.22} />
+          <SectionPattern variant="curves" color="#5d2b1d" opacity={0.12} />
           <div className="relative z-10 mx-auto w-full max-w-6xl space-y-8 px-6">
             <div className="max-w-3xl space-y-3">
               <p className="text-sm font-semibold tracking-[0.12em] uppercase">Transformação</p>
@@ -337,11 +356,11 @@ export function SmartProcedureLanding() {
                 Sua jornada com a Smart Plástica, passo a passo.
               </h2>
               <p className="text-lg text-[#6f5144]">
-                Da primeira consulta até a recuperação completa, você nunca caminha sozinha.
+                Em 6 etapas, da videochamada inicial ao pós-operatório, você nunca caminha sozinha.
               </p>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {journey.map((step, index) => (
                 <Card key={step.title} className="border-[#e0c6b5] bg-white">
                   <CardHeader>
@@ -362,7 +381,7 @@ export function SmartProcedureLanding() {
         </section>
 
         <section className="relative overflow-hidden bg-[#ede3d8] py-20">
-          <SectionPattern variant="grid" color="#6b3425" opacity={0.14} />
+          <SectionPattern variant="grid" color="#6b3425" opacity={0.08} />
           <div className="relative z-10 mx-auto w-full max-w-7xl space-y-8 px-6">
             <div className="max-w-3xl space-y-3">
               <p className="text-sm font-semibold tracking-[0.12em] text-[#8f563f] uppercase">Diferenciais</p>
@@ -431,24 +450,35 @@ export function SmartProcedureLanding() {
               <p className="text-[#6f5144]">Depoimentos reais em vídeo para fortalecer segurança e confiança.</p>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              {videoTestimonials.map((video) => (
-                <Card key={video.id} className="border-[#d8b59f] bg-[#fffdfb]">
-                  <CardContent>
-                    <div className="overflow-hidden rounded-xl border border-[#d8b59f] bg-[#f8eee5]">
-                      <iframe
-                        src={video.src}
-                        title={video.title}
-                        className="aspect-[9/16] w-full"
-                        loading="lazy"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        referrerPolicy="strict-origin-when-cross-origin"
-                        allowFullScreen
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="overflow-hidden rounded-2xl">
+              <Marquee
+                autoFill
+                gradient={false}
+                speed={26}
+                pauseOnHover
+                pauseOnClick
+                className="[--gap:1rem] py-1"
+              >
+                {videoTestimonials.map((video) => (
+                  <div key={video.id} className="mr-4 w-[74vw] max-w-[320px] sm:w-[280px] md:w-[300px]">
+                    <Card className="border-[#d8b59f] bg-[#fffdfb]">
+                      <CardContent>
+                        <div className="overflow-hidden rounded-xl border border-[#d8b59f] bg-[#f8eee5]">
+                          <iframe
+                            src={video.src}
+                            title={video.title}
+                            className="aspect-[9/16] w-full"
+                            loading="lazy"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            referrerPolicy="strict-origin-when-cross-origin"
+                            allowFullScreen
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                ))}
+              </Marquee>
             </div>
           </div>
         </section>
@@ -518,10 +548,11 @@ export function SmartProcedureLanding() {
               </p>
 
               <div className="space-y-2 text-[#fde7d7]">
+                <p className="flex items-center gap-2"><Check className="h-4 w-4" /> Videochamada inicial gratuita (30 a 45 min)</p>
                 <p className="flex items-center gap-2"><Check className="h-4 w-4" /> Fluxo rápido e guiado</p>
                 <p className="flex items-center gap-2"><Check className="h-4 w-4" /> Perguntas objetivas para te conhecer melhor</p>
                 <p className="flex items-center gap-2"><Check className="h-4 w-4" /> Direcionamento personalizado por unidade</p>
-                <p className="flex items-center gap-2"><Check className="h-4 w-4" /> Retorno em até 5 minutos no horário comercial</p>
+                <p className="flex items-center gap-2"><Check className="h-4 w-4" /> Retorno ao formulário/e-mail em até 24 horas úteis</p>
               </div>
             </div>
 
@@ -539,7 +570,7 @@ export function SmartProcedureLanding() {
                   className="h-12 w-full rounded-lg bg-[#a74e31] text-base text-white hover:bg-[#8f4229]"
                   onClick={openFunnel}
                 >
-                  Quero agendar minha avaliação
+                  Quero falar com uma consultora
                 </Button>
                 <p className="mt-3 text-center text-xs text-[#7f6152]">
                   Você preenche em poucos cliques e continua direto no WhatsApp da equipe.
@@ -550,7 +581,7 @@ export function SmartProcedureLanding() {
         </section>
 
         <section className="relative overflow-hidden bg-[#f7f0e9] py-14">
-          <SectionPattern variant="rings" color="#6b3425" opacity={0.15} />
+          <SectionPattern variant="rings" color="#6b3425" opacity={0.1} />
           <div className="relative z-10 mx-auto w-full max-w-4xl px-6 text-center">
             <h2 className="font-display text-5xl leading-tight text-[#5b2c1e]">
               Você não nasceu para se esconder. Você nasceu para se reconhecer.
@@ -564,14 +595,14 @@ export function SmartProcedureLanding() {
               className="mt-6 h-12 rounded-lg bg-[#a74e31] px-7 text-white hover:bg-[#8f4229]"
               onClick={openFunnel}
             >
-              Agendar minha avaliação agora
+              Falar com uma consultora agora
             </Button>
           </div>
         </section>
       </main>
 
       <footer className="relative overflow-hidden bg-[#3f1f15] py-14 text-[#f5e7dc]">
-        <SectionPattern variant="grid" color="#d5b79f" opacity={0.13} />
+        <SectionPattern variant="grid" color="#d5b79f" opacity={0.08} />
         <div className="relative z-10 mx-auto grid w-full max-w-7xl gap-8 px-6 lg:grid-cols-[1fr_1fr_1.2fr]">
           <div>
             <SmartLogo variant="lightOnDark" />
@@ -585,8 +616,10 @@ export function SmartProcedureLanding() {
             <p className="font-semibold">Contato</p>
             <p>WhatsApp: +55 11 91013-6326</p>
             <p>E-mail: contato@smartplastica.com.br</p>
-            <p>Unidades: São Paulo (Moema) e Pelotas</p>
+            <p>Unidades: São Paulo-SP (Moema) e Pelotas-RS</p>
             <p>Atendimento comercial: seg-sex, 9h às 18h</p>
+            <p>Resposta ao formulário/e-mail: até 24 horas úteis</p>
+            <p>Consultoria online disponível</p>
             <div className="pt-2">
               <Button
                 type="button"
@@ -622,7 +655,7 @@ export function SmartProcedureLanding() {
 
       <Dialog open={isFunnelOpen} onOpenChange={setIsFunnelOpen}>
         <DialogContent
-          className="max-h-[92dvh] overflow-y-auto border-[#dfc3b2] bg-[#fffdfa] p-0 sm:max-h-[92vh] sm:max-w-2xl"
+          className="max-h-[92dvh] w-full max-w-[calc(100%-1rem)] overflow-y-auto rounded-2xl border-[#dfc3b2] bg-[#fffdfa] p-0 sm:max-h-[92vh] sm:max-w-2xl"
           showCloseButton={false}
         >
           <div className="sr-only">
@@ -631,7 +664,15 @@ export function SmartProcedureLanding() {
               Fluxo rápido de perguntas para direcionar seu atendimento antes do WhatsApp.
             </DialogDescription>
           </div>
-          <QualificationFunnel />
+          <DialogClose
+            className="absolute top-3 right-3 z-30 inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#d9baa6] bg-[#fffdfa]/95 text-[#8f6a59] transition hover:bg-[#f6e8dd] hover:text-[#6c3828]"
+            aria-label="Fechar formulário"
+          >
+            <X className="h-4 w-4" />
+          </DialogClose>
+          <div className="pt-10">
+            <QualificationFunnel />
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -647,7 +688,7 @@ export function SmartProcedureLanding() {
           onClick={openFunnel}
         >
           <WhatsAppIcon />
-          Agendar avaliação
+          Falar com consultora
         </Button>
       </div>
     </div>

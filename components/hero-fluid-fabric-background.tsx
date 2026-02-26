@@ -92,10 +92,10 @@ varying float vElevation;
 varying vec3 vViewPosition;
 
 void main() {
-  vec3 colorDark = vec3(0.22, 0.09, 0.04);
-  vec3 colorMid = vec3(0.45, 0.20, 0.08);
-  vec3 colorLight = vec3(0.65, 0.35, 0.18);
-  vec3 colorHighlight = vec3(0.82, 0.55, 0.35);
+  vec3 colorDark = vec3(0.16, 0.06, 0.03);
+  vec3 colorMid = vec3(0.31, 0.13, 0.06);
+  vec3 colorLight = vec3(0.46, 0.22, 0.12);
+  vec3 colorHighlight = vec3(0.62, 0.34, 0.20);
 
   vec3 dx = dFdx(vViewPosition);
   vec3 dy = dFdy(vViewPosition);
@@ -106,21 +106,21 @@ void main() {
   vec3 halfVector = normalize(lightDir + viewDir);
 
   float diffuseLight = max(dot(normal, lightDir), 0.0);
-  float specularLight = pow(max(dot(normal, halfVector), 0.0), 32.0) * 0.35;
+  float specularLight = pow(max(dot(normal, halfVector), 0.0), 30.0) * 0.22;
 
-  float h = smoothstep(-2.0, 2.0, vElevation);
+  float h = smoothstep(-2.3, 2.2, vElevation - 0.45);
   vec3 baseColor = mix(colorDark, colorMid, smoothstep(0.1, 0.4, h));
   baseColor = mix(baseColor, colorLight, smoothstep(0.4, 0.7, h));
   baseColor = mix(baseColor, colorHighlight, smoothstep(0.7, 0.95, h));
 
-  vec3 finalColor = baseColor * (diffuseLight * 0.5 + 0.6);
-  finalColor += specularLight * vec3(0.8, 0.6, 0.4);
+  vec3 finalColor = baseColor * (diffuseLight * 0.42 + 0.44);
+  finalColor += specularLight * vec3(0.65, 0.45, 0.30);
 
   float threadFreq = 350.0;
   float distortion = vElevation * 0.15;
   float threads = sin((vUv.y * 3.0 + vUv.x * 2.0 + distortion) * threadFreq);
   threads = smoothstep(0.2, 1.0, threads);
-  finalColor -= threads * 0.06;
+  finalColor -= threads * 0.07;
 
   gl_FragColor = vec4(finalColor, 1.0);
 }
@@ -142,7 +142,7 @@ export function HeroFluidFabricBackground({ className }: HeroFluidFabricBackgrou
     const isMobile = window.matchMedia("(max-width: 768px), (pointer: coarse)").matches;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color("#f7ede4");
+    scene.background = new THREE.Color("#dbc7b7");
 
     const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 1000);
     camera.position.z = isMobile ? 5.2 : 4.5;
